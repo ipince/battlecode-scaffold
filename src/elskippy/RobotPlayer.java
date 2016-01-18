@@ -1,10 +1,9 @@
 package elskippy;
 
-import battlecode.common.Clock;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotType;
+import battlecode.common.*;
+import elskippy.messages.*;
+
+import java.util.List;
 
 public class RobotPlayer {
 
@@ -14,8 +13,10 @@ public class RobotPlayer {
 	private final RobotController rc;
 	private final Move move;
 	private final Attack attack;
+	private final Protect protect;
 
 	private final Archon archon;
+	private DistressMessage activeDistressMessage = null;
 
 	private MapLocation rendezvousLocation;
 
@@ -38,6 +39,7 @@ public class RobotPlayer {
 		move = new Move(rc);
 		attack = new Attack(rc);
 		archon = new Archon(rc);
+		protect = new Protect(rc, attack, move);
 	}
 
 	/**
@@ -67,11 +69,32 @@ public class RobotPlayer {
 		rendezvousLocation = new MapLocation(x / locations.length, y / locations.length);
 	}
 
+	private boolean hostileRobotsNearby() {
+		return rc.senseHostileRobots(rc.getLocation(), rc.getType().attackRadiusSquared).length > 0;
+	}
+
+	private void checkMessages() throws GameActionException {
+		List<Message> messages = MessageDispatcher.getMessages(rc);
+		for (Message m: messages) {
+			if (m instanceof DistressMessage) {
+				activeDistressMessage = (DistressMessage) m;
+			} else if (m instanceof ClearDistressMessage)
+				activeDistressMessage = null;
+		}
+	}
+
 	private void mainLoop() throws GameActionException {
+		checkMessages();
+
 		if (rc.getType() == RobotType.ARCHON) {
 			archon.main();
-		} else if (rc.getType().canAttack()) {
+		} else if (rc.getType().canAttack() && activeDistressMessage != null){
+			protect.anAlly(activeDistressMessage.getLocation(), activeDistressMessage.getEscapeRoute());
+		} else if (rc.getType().canAttack() && hostileRobotsNearby()) {
 			attack.aMofo();
+		} else {
+			rc.setIndicatorString(0, "I have nothing to do; I'm just wandering around");
+			move.decisively(Direction.NORTH_WEST);
 		}
 	}
 
