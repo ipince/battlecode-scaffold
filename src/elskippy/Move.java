@@ -19,7 +19,10 @@ public class Move {
 	 * in that direction, the rubble is cleared.
 	 */
 	public void decisively(MapLocation target) throws GameActionException {
-		Direction direction = rc.getLocation().directionTo(target);
+		decisively(rc.getLocation().directionTo(target));
+	}
+
+	public void decisively(Direction direction) throws GameActionException {
 		if (rc.senseRubble(rc.getLocation().add(direction)) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
 			rc.clearRubble(direction);
 		} else if (rc.canMove(direction)) {

@@ -1,9 +1,8 @@
 package elskippy;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.RobotController;
-import battlecode.common.RobotType;
+import battlecode.common.*;
+import elskippy.messages.ClearDistressMessage;
+import elskippy.messages.DistressMessage;
 
 public class Archon {
 
@@ -13,12 +12,55 @@ public class Archon {
 		this.rc = rc;
 	}
 
+	class EnemyInfo {
+		private MapLocation closestLocation;
+		private int numberOfEnemies = 0;
+
+		public EnemyInfo(MapLocation closestLocation, int numberOfEnemies) {
+			this.closestLocation = closestLocation;
+			this.numberOfEnemies = numberOfEnemies;
+		}
+	}
+
+	private EnemyInfo getEnemyInfo() {
+		RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), -1);
+		MapLocation loc = null;
+		if (enemies.length > 0) loc = enemies[0].location;
+
+		return new EnemyInfo(loc, enemies.length);
+
+	}
+
+	boolean activeDistressSignal = false;
+	private void sendDistressSignal(MapLocation location) throws GameActionException {
+		if (!activeDistressSignal) {
+			DistressMessage signal = new DistressMessage(location, Direction.NORTH_EAST);
+			signal.sendMessage(rc, 100);
+			activeDistressSignal = true;
+		}
+	}
+
+	private void clearDistressSignal() throws GameActionException {
+		if (activeDistressSignal) {
+			ClearDistressMessage signal = new ClearDistressMessage();
+			activeDistressSignal = false;
+			signal.sendMessage(rc, 100);
+		}
+	}
+
+
 	public void main() throws GameActionException {
 		if (rc.isCoreReady()) {
+			EnemyInfo enemies = null;
+			if ((enemies = getEnemyInfo()).numberOfEnemies > 0)
+				sendDistressSignal(enemies.closestLocation);
+			else
+				clearDistressSignal();
+
 			Direction[] directions = getDirections(Direction.EAST); // arbitrary
 			for (Direction direction : directions) {
-				if (rc.canBuild(direction, RobotType.TURRET)) {
-					rc.build(direction, RobotType.TURRET);
+				if (rc.canBuild(direction, RobotType.SOLDIER)) {
+					rc.build(direction, RobotType.SOLDIER);
 					break;
 				}
 			}
