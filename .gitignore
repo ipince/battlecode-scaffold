@@ -23,4 +23,4 @@ bin/
 *~
 
 # eclipse stuff
-ide/eclipse
+ide/eclipse/*
