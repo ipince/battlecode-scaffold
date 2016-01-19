@@ -20,11 +20,11 @@ public class RobotPlayer {
 	private static final int SQUARED_DISTANCE_TO_RENDEZVOUS = 4;
 
 	private final RobotController rc;
-	private final Move move;
 	private final Attack attack;
 	private final Protect protect;
 
 	private final Archon archon;
+	private final Scout scout;
 	private DistressMessage activeDistressMessage = null;
 
 	private MapLocation rendezvousLocation;
@@ -45,10 +45,10 @@ public class RobotPlayer {
 
 	public RobotPlayer(RobotController rc) {
 		this.rc = rc;
-		move = new Move(rc);
 		attack = new Attack(rc);
 		archon = new Archon(rc);
-		protect = new Protect(rc, attack, move);
+		scout = new Scout(rc);
+		protect = new Protect(rc, attack);
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class RobotPlayer {
 			if (rc.getType() == RobotType.ARCHON) {
 				if (rc.isCoreReady()
 						&& rc.getLocation().distanceSquaredTo(rendezvousLocation) > SQUARED_DISTANCE_TO_RENDEZVOUS) {
-					move.decisively(rendezvousLocation);
+					Move.decisively(rc, rendezvousLocation);
 				}
 			}
 			Clock.yield();
@@ -98,6 +98,8 @@ public class RobotPlayer {
 
 		if (rc.getType() == RobotType.ARCHON) {
 			archon.main();
+		} else if (rc.getType() == RobotType.SCOUT) {
+			scout.main();
 		} else if (rc.getType().canAttack() && activeDistressMessage != null) {
 			protect.anAlly(activeDistressMessage.getLocation(), activeDistressMessage.getEscapeRoute());
 		} else if (rc.getType().canAttack() && hostileRobotsNearby()) {
@@ -105,7 +107,7 @@ public class RobotPlayer {
 		} else if (rc.getType().canMove()) {
 			Direction randomDir = randomDirection();
 			rc.setIndicatorString(0, "I have nothing to do; I'm just wandering around in direction " + randomDir);
-			move.decisively(randomDir);
+			Move.decisively(rc, randomDir);
 		}
 	}
 
