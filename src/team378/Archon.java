@@ -9,12 +9,27 @@ import battlecode.common.RobotType;
 import team378.messages.ClearDistressMessage;
 import team378.messages.DistressMessage;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
 public class Archon {
+
+	private static final Map<RobotType, Double> robotPcts = new HashMap<>();
+	private static final Random random = new Random();
+
+	static {
+		robotPcts.put(RobotType.SOLDIER, 0.50);
+		robotPcts.put(RobotType.TURRET, 0.20);
+		robotPcts.put(RobotType.GUARD, 0.30);
+		robotPcts.put(RobotType.SCOUT, 0.05);
+	}
 
 	private final RobotController rc;
 
 	public Archon(RobotController rc) {
 		this.rc = rc;
+		random.setSeed(rc.getID());
 	}
 
 	class EnemyInfo {
@@ -71,10 +86,11 @@ public class Archon {
 				// maybe consider the rubble before deciding.
 			}
 
+			RobotType toBuild = randomType();
 			Direction[] directions = getDirections(Direction.EAST); // arbitrary
 			for (Direction direction : directions) {
-				if (rc.canBuild(direction, RobotType.SOLDIER)) {
-					rc.build(direction, RobotType.SOLDIER);
+				if (rc.canBuild(direction, toBuild)) {
+					rc.build(direction, toBuild);
 					break;
 				}
 			}
@@ -89,6 +105,17 @@ public class Archon {
 			directions[i] = Direction.values()[(desired.ordinal() + deltas[i]) % Direction.values().length];
 		}
 		return directions;
+	}
+
+	private RobotType randomType() {
+		// No time to implement real random, so making shitty alternative now.
+		if (rc.getRoundNum() % 10 < 4) { // 50%
+			return RobotType.SOLDIER;
+		} else if (rc.getRoundNum() % 10 < 7) { // 30%
+			return RobotType.SOLDIER;
+		} else {
+			return RobotType.TURRET;
+		}
 	}
 
 }

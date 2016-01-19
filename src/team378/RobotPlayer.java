@@ -1,8 +1,16 @@
 package team378;
 
-import team378.messages.*;
-
-import battlecode.common.*;
+import battlecode.common.Clock;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
+import battlecode.common.RobotType;
+import team378.messages.ClearDistressMessage;
+import team378.messages.DistressMessage;
+import team378.messages.Message;
+import team378.messages.MessageDispatcher;
+import team378.messages.Protect;
 
 import java.util.List;
 
@@ -79,8 +87,9 @@ public class RobotPlayer {
 		for (Message m: messages) {
 			if (m instanceof DistressMessage) {
 				activeDistressMessage = (DistressMessage) m;
-			} else if (m instanceof ClearDistressMessage)
+			} else if (m instanceof ClearDistressMessage) {
 				activeDistressMessage = null;
+			}
 		}
 	}
 
@@ -89,14 +98,19 @@ public class RobotPlayer {
 
 		if (rc.getType() == RobotType.ARCHON) {
 			archon.main();
-		} else if (rc.getType().canAttack() && activeDistressMessage != null){
+		} else if (rc.getType().canAttack() && activeDistressMessage != null) {
 			protect.anAlly(activeDistressMessage.getLocation(), activeDistressMessage.getEscapeRoute());
 		} else if (rc.getType().canAttack() && hostileRobotsNearby()) {
 			attack.aMofo();
-		} else {
-			rc.setIndicatorString(0, "I have nothing to do; I'm just wandering around");
-			move.decisively(Direction.NORTH_WEST);
+		} else if (rc.getType().canMove()) {
+			Direction randomDir = randomDirection();
+			rc.setIndicatorString(0, "I have nothing to do; I'm just wandering around in direction " + randomDir);
+			move.decisively(randomDir);
 		}
+	}
+
+	private Direction randomDirection() {
+		return Direction.values()[(rc.getID() + rc.getRoundNum()) % Direction.values().length];
 	}
 
 	// TODO: list of implementable ideas.
