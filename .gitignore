@@ -21,3 +21,6 @@ bin/
 *.bak
 *.swp
 *~
+
+# eclipse stuff
+ide/eclipse
