@@ -1,8 +1,13 @@
-package elskippy;
+package team378;
 
-import battlecode.common.*;
-import elskippy.messages.ClearDistressMessage;
-import elskippy.messages.DistressMessage;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
+import battlecode.common.RobotInfo;
+import battlecode.common.RobotType;
+import team378.messages.ClearDistressMessage;
+import team378.messages.DistressMessage;
 
 public class Archon {
 
@@ -25,7 +30,9 @@ public class Archon {
 	private EnemyInfo getEnemyInfo() {
 		RobotInfo[] enemies = rc.senseHostileRobots(rc.getLocation(), -1);
 		MapLocation loc = null;
-		if (enemies.length > 0) loc = enemies[0].location;
+		if (enemies.length > 0) {
+			loc = enemies[0].location;
+		}
 
 		return new EnemyInfo(loc, enemies.length);
 
@@ -52,10 +59,17 @@ public class Archon {
 	public void main() throws GameActionException {
 		if (rc.isCoreReady()) {
 			EnemyInfo enemies = null;
-			if ((enemies = getEnemyInfo()).numberOfEnemies > 0)
+			if ((enemies = getEnemyInfo()).numberOfEnemies > 0) {
 				sendDistressSignal(enemies.closestLocation);
-			else
+			} else {
 				clearDistressSignal();
+			}
+
+			MapLocation[] parts = rc.sensePartLocations(RobotType.ARCHON.sensorRadiusSquared);
+			if (parts.length > 0) {
+				// find min-distance part. if multiple, choose one randomly.
+				// maybe consider the rubble before deciding.
+			}
 
 			Direction[] directions = getDirections(Direction.EAST); // arbitrary
 			for (Direction direction : directions) {

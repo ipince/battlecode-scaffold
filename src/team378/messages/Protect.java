@@ -1,12 +1,13 @@
-package elskippy.messages;
+package team378.messages;
 
+
+import team378.Attack;
+import team378.Move;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
-import elskippy.Attack;
-import elskippy.Move;
 
 public class Protect {
 

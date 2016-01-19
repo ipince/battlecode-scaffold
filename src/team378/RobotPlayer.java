@@ -1,7 +1,8 @@
-package elskippy;
+package team378;
+
+import team378.messages.*;
 
 import battlecode.common.*;
-import elskippy.messages.*;
 
 import java.util.List;
 

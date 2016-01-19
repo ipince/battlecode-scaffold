@@ -1,4 +1,4 @@
-package elskippy.messages;
+package team378.messages;
 
 
 public enum MessageType {

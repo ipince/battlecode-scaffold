@@ -1,4 +1,4 @@
-package elskippy;
+package team378;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;

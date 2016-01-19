@@ -1,4 +1,4 @@
-package elskippy;
+package team378;
 
 import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
