@@ -1,10 +1,11 @@
-package elskippy.messages;
+package team378.messages;
+
+import team378.messages.DistressMessage;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.Signal;
 import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 
 public class DistressMessageTest {
